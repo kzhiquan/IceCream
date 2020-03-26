@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
                        DESC
   s.homepage         = 'https://github.com/kzhiquan/IceCream.git'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'caiyue1993' => 'yuecai.nju@gmail.com' }
+  s.author           = { 'kzhiquan' => 'kzhiquan@gmail.com' }
   s.source           = { :git => 'https://github.com/kzhiquan/IceCream.git', :tag => s.version.to_s }
 
   s.social_media_url = 'https://twitter.com/caiyue5'
