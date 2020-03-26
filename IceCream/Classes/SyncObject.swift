@@ -28,6 +28,24 @@ public final class SyncObject<T> where T: Object & CKRecordConvertible & CKRecor
     public init(realmConfiguration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
         self.realmConfiguration = realmConfiguration
     }
+    
+    public func clearUp() {
+        BackgroundWorker.shared.start {
+            let realm = try! Realm(configuration: self.realmConfiguration)
+            let objects = realm.objects(T.self).filter { $0.isDeleted }
+            
+            var tokens: [NotificationToken] = []
+            self.notificationToken.flatMap { tokens = [$0] }
+            
+            realm.beginWrite()
+            objects.forEach({ realm.delete($0) })
+            do {
+                try realm.commitWrite(withoutNotifying: tokens)
+            } catch {
+                
+            }
+        }
+    }
 }
 
 // MARK: - Zone information
@@ -131,21 +149,7 @@ extension SyncObject: Syncable {
     }
     
     public func cleanUp() {
-        BackgroundWorker.shared.start {
-            let realm = try! Realm(configuration: self.realmConfiguration)
-            let objects = realm.objects(T.self).filter { $0.isDeleted }
-            
-            var tokens: [NotificationToken] = []
-            self.notificationToken.flatMap { tokens = [$0] }
-            
-            realm.beginWrite()
-            objects.forEach({ realm.delete($0) })
-            do {
-                try realm.commitWrite(withoutNotifying: tokens)
-            } catch {
-                
-            }
-        }
+        self.clearUp()
     }
     
     public func pushLocalObjectsToCloudKit() {
